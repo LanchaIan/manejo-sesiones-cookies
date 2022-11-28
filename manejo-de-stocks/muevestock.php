@@ -120,6 +120,32 @@ function insertar(){
 }
 
 function actualizar(){
+        global $conProyecto;
+        global $id;
+        $Nombre = $_POST["Nombre"];
+        $Nombre_corto = $_POST["Nombre_corto"];
+        $Descripcion = $_POST["Descripcion"];
+        $pvp = $_POST["pvp"];
+        $familia = $_POST["familia"];
+        
+        "SELECT stocks.producto, 
+        stocks.tienda,
+        stocks.unidades
+ FROM 
+        stocks
+    WHERE
+    stocks.producto = $id");
+        $sql = $conProyecto->prepare("UPDATE productos
+        SET
+        nombre=:Nombre, nombre_corto=:Nombre_corto, descripcion=:Descripcion, pvp=:pvp, familia=:familia
+        where
+        id=$id");
+        $sql->bindParam(':Nombre',$Nombre);
+        $sql->bindParam(':Nombre_corto',$Nombre_corto);
+        $sql->bindParam(':Descripcion',$Descripcion);
+        $sql->bindParam(':pvp',$pvp);
+        $sql->bindParam(':familia',$familia);
+        $sql->execute();
     echo"<h4>estoy actualizando</h4>";
 }
 
