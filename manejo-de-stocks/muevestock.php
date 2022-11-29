@@ -96,57 +96,110 @@ function mover(){
     global $conProyecto;
     global $tienda_elegida;
     global $tienda_original;
+    global $unidades_movidas;
     $existente = false;
+    if ($tienda_elegida == $tienda_original){
+        echo "NO SE PUEDE ENVIAR A LA MISMA TIENDA";
+    }
     while ($resultado != null) {
         
         $tienda_comprobar = $resultado->tienda;
         if ($tienda_elegida == $tienda_comprobar){
-            echo "<h2> a actualizar </h2>";
+            sumar();
+            restar();
             $existente = true;
-            actualizar();
         }
         $resultado = $result->fetch(PDO::FETCH_OBJ);
     }
     if ($existente == false) {
+ 
         echo "<h2> a insertar </h2>";
-        insertar();
     }
+    echo "<h2>Vuelva al listado para actualizar la información</h2>";
 
 }
 
 function insertar(){
     echo "<h4>estoy insertando</h4>";
+    global $conProyecto;
 
+
+    $sql = $conProyecto->prepare("INSERT INTO stocks (producto,tienda,unidades)
+    values
+    (:producto,:tienda,:unidades)");
+     $sql->bindParam(':producto',$producto);
+     $sql->bindParam(':tienda',$tienda);
+     $sql->bindParam(':unidades',$unidades);
+     $sql->execute();
 }
 
-function actualizar(){
-        global $conProyecto;
-        global $id;
-        $Nombre = $_POST["Nombre"];
-        $Nombre_corto = $_POST["Nombre_corto"];
-        $Descripcion = $_POST["Descripcion"];
-        $pvp = $_POST["pvp"];
-        $familia = $_POST["familia"];
-        
-        "SELECT stocks.producto, 
+function sumar(){
+    global $conProyecto;
+    global $tienda_original;
+    global $tienda_elegida;
+    global $unidades_movidas;
+    global $id;
+    echo $id;
+    $result = $conProyecto->query(
+    "SELECT stocks.producto, 
         stocks.tienda,
         stocks.unidades
- FROM 
+    FROM 
         stocks
     WHERE
-    stocks.producto = $id");
-        $sql = $conProyecto->prepare("UPDATE productos
+    stocks.tienda = $tienda_elegida
+    AND producto = $id");
+
+    $resultado = $result->fetch(PDO::FETCH_OBJ);
+
+    $producto = $resultado->producto;
+    $unidades = $resultado->unidades;
+    $unidades_finales = $unidades + $unidades_movidas;
+    $sumar = $conProyecto->prepare("UPDATE stocks
         SET
-        nombre=:Nombre, nombre_corto=:Nombre_corto, descripcion=:Descripcion, pvp=:pvp, familia=:familia
+        unidades=:unidades
         where
-        id=$id");
-        $sql->bindParam(':Nombre',$Nombre);
-        $sql->bindParam(':Nombre_corto',$Nombre_corto);
-        $sql->bindParam(':Descripcion',$Descripcion);
-        $sql->bindParam(':pvp',$pvp);
-        $sql->bindParam(':familia',$familia);
-        $sql->execute();
-    echo"<h4>estoy actualizando</h4>";
+        tienda=$tienda_elegida
+        AND producto = $producto");
+        $sumar->bindParam(':unidades',$unidades_finales);
+        $sumar->execute();
+   
+    echo "<p>relizado</p>";
+}
+
+function restar(){
+    global $conProyecto;
+    global $tienda_original;
+    global $tienda_elegida;
+    global $unidades_movidas;
+    global $id;
+    $result = $conProyecto->query(
+    "SELECT stocks.producto, 
+        stocks.tienda,
+        stocks.unidades
+    FROM 
+        stocks
+    WHERE
+    stocks.tienda = $tienda_original
+    AND producto = $id");
+
+    $resultado = $result->fetch(PDO::FETCH_OBJ);
+
+    $producto = $resultado->producto;
+    $unidades = $resultado->unidades;
+    $unidades_finales = $unidades - $unidades_movidas;
+
+    $restar = $conProyecto->prepare("UPDATE stocks
+        SET
+        unidades=:unidades
+        where
+        tienda=$tienda_original
+        AND producto = $producto");
+        $restar->bindParam(':unidades',$unidades_finales);
+        $restar->execute();
+    
+   
+    echo "<p>relizado 2</p>";
 }
 
 if (isset($_POST['tienda_elegida'])){
@@ -155,6 +208,10 @@ if (isset($_POST['tienda_elegida'])){
 
 if (isset($_POST['tienda_original'])){
     $tienda_original = $_POST['tienda_original'];
+}
+
+if (isset($_POST['unidades_movidas'])){
+    $unidades_movidas = $_POST['unidades_movidas'];
 }
 
 if (isset($_POST['Mover'])){
@@ -168,75 +225,8 @@ if (isset($_POST['brb'])){
 }
 ?>
 
-<?php
-
-    $result = $conProyecto->query(
-        "SELECT stocks.producto, 
-                stocks.tienda,
-                stocks.unidades
-        FROM 
-                stocks
-        WHERE
-        stocks.producto = $id");
-    
-    
-    $resultado = $result->fetch(PDO::FETCH_OBJ);
-
-    function insertar__(){
-        global $conProyecto;
-        $producto = $_POST["producto"];
-        $tienda = $_POST["tienda"];
-        $unidades = $_POST["unidades"];
-    
-        $sql = $conProyecto->prepare("INSERT INTO stocks (producto,tienda,unidades)
-        values
-        (:producto,:tienda,:unidades)");
-         $sql->bindParam(':producto',$producto);
-         $sql->bindParam(':tienda',$tienda);
-         $sql->bindParam(':unidades',$unidades);
-         $sql->execute();
-    
-    }
-    
-    if (isset($_POST['insertar__'])){
-        insertar__();
-    }
-    
-    function actualizar__(){
-        global $conProyecto;
-        global $id;
-        $Nombre = $_POST["Nombre"];
-        $Nombre_corto = $_POST["Nombre_corto"];
-        $Descripcion = $_POST["Descripcion"];
-        $pvp = $_POST["pvp"];
-        $familia = $_POST["familia"];
-
-        $sql = $conProyecto->prepare("UPDATE productos
-        SET
-        nombre=:Nombre, nombre_corto=:Nombre_corto, descripcion=:Descripcion, pvp=:pvp, familia=:familia
-        where
-        id=$id");
-        $sql->bindParam(':Nombre',$Nombre);
-        $sql->bindParam(':Nombre_corto',$Nombre_corto);
-        $sql->bindParam(':Descripcion',$Descripcion);
-        $sql->bindParam(':pvp',$pvp);
-        $sql->bindParam(':familia',$familia);
-        $sql->execute();
-
-    }
-
-    if (isset($_POST['actualizar__'])){
-        actualizar__();
-    }
-    
-
-    
-
-    
-    if (isset($_POST['Si'])){
-        mover();
-    }
-    
-    $conProyecto = null;
-?>
-
+<html>
+    <form action="listado.php" method="post">
+        <input type='submit' name='boton' value='Volver'/>
+    </form>
+<html>
