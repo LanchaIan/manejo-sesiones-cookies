@@ -52,29 +52,38 @@ echo "<table class='default'>";
         echo "</tr>";
 
 while ($resultado != null) {
-    $unidades_ = $resultado->unidades;
-    $tienda = $resultado->tienda;
-        echo "<tr>";
-            echo "<td>$tienda</td>";
-            echo "<td>$resultado->unidades</td>";
-            echo '<form action="muevestock.php" method="post">';
-                echo '<td><select id="tienda_elegida" name="tienda_elegida">';
-                    echo '<option value="1">CENTRAL</option>';
-                    echo '<option value="2">SUCURSAL1</option>';
-                    echo '<option value="3">SUCURSAL2</option>';
-                echo '</select></td>';
-                echo '<td><select id="unidades_movidas" name="unidades_movidas">';
-                    while ($unidades_ != null) {
-                        echo "<option value='$unidades_'>$unidades_</option>";
-                        $unidades_ = $unidades_ - 1;
-                    }
-                echo '</select></td>';
-                echo "<input type='hidden' name='tienda_original' value='$resultado->tienda'/>";
-                echo "<input type='hidden' name='id' value='$id'/>";
-                echo "<td><input type='submit' name='Mover' value='Mover'/></td>";
-            echo '</form>';
-        echo "</tr>";
-    echo "</table";
+    if ($resultado->unidades == 0){
+        $sql = $conProyecto->prepare("Delete From stocks 
+        Where stocks.tienda = $resultado->tienda
+        AND producto = $id");
+        $sql->execute();
+    }
+    else{
+        $unidades_ = $resultado->unidades;
+        $tienda = $resultado->tienda;
+            echo "<tr>";
+                echo "<td>$tienda</td>";
+                echo "<td>$resultado->unidades</td>";
+                echo '<form action="muevestock.php" method="post">';
+                    echo '<td><select id="tienda_elegida" name="tienda_elegida">';
+                        echo '<option value="1">CENTRAL</option>';
+                        echo '<option value="2">SUCURSAL1</option>';
+                        echo '<option value="3">SUCURSAL2</option>';
+                    echo '</select></td>';
+                    echo '<td><select id="unidades_movidas" name="unidades_movidas">';
+                        while ($unidades_ != null) {
+                            echo "<option value='$unidades_'>$unidades_</option>";
+                            $unidades_ = $unidades_ - 1;
+                        }
+                    echo '</select></td>';
+                    echo "<input type='hidden' name='tienda_original' value='$resultado->tienda'/>";
+                    echo "<input type='hidden' name='id' value='$id'/>";
+                    echo "<td><input type='submit' name='Mover' value='Mover'/></td>";
+                echo '</form>';
+            echo "</tr>";
+        echo "</table";
+    }
+    
 
     $resultado = $result->fetch(PDO::FETCH_OBJ);
 }
@@ -101,6 +110,7 @@ function mover(){
     if ($tienda_elegida == $tienda_original){
         echo "NO SE PUEDE ENVIAR A LA MISMA TIENDA";
     }
+    
     while ($resultado != null) {
         
         $tienda_comprobar = $resultado->tienda;
@@ -112,7 +122,8 @@ function mover(){
         $resultado = $result->fetch(PDO::FETCH_OBJ);
     }
     if ($existente == false) {
- 
+        insertar();
+        restar();
         echo "<h2> a insertar </h2>";
     }
     echo "<h2>Vuelva al listado para actualizar la información</h2>";
@@ -122,13 +133,32 @@ function mover(){
 function insertar(){
     echo "<h4>estoy insertando</h4>";
     global $conProyecto;
+    global $resultado;
+    global $tienda_elegida;
+    global $tienda_original;
+    global $unidades_movidas;
+    global $id;
 
+    $result = $conProyecto->query(
+        "SELECT stocks.producto, 
+            stocks.tienda,
+            stocks.unidades
+        FROM 
+            stocks
+        WHERE
+        stocks.tienda = $tienda_original
+        AND producto = $id");
+    
+        $resultado = $result->fetch(PDO::FETCH_OBJ);
+    
+    $producto = $resultado->producto;
+    $unidades = $unidades_movidas;
 
     $sql = $conProyecto->prepare("INSERT INTO stocks (producto,tienda,unidades)
     values
     (:producto,:tienda,:unidades)");
      $sql->bindParam(':producto',$producto);
-     $sql->bindParam(':tienda',$tienda);
+     $sql->bindParam(':tienda',$tienda_elegida);
      $sql->bindParam(':unidades',$unidades);
      $sql->execute();
 }
