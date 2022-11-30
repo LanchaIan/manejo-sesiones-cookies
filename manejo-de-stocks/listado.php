@@ -72,8 +72,26 @@ while ($resultado != null) {
         echo "</tr>";
     echo "</table";
 
+    echo"<form method='post'>";
+        echo"<input type='submit' name='borrar' value='borrar sesion'/>";
+    echo"</form>";
+
     $resultado = $result->fetch(PDO::FETCH_OBJ);
+}
+
+if (isset($_POST["borrar"])){
+    borrar();  
+}
+function borrar(){
+    if (isset($_SESSION["Nombre"])){
+        session_destroy();
+        echo "Borrada con éxito";  
+    }
+    if (!isset($_SESSION["Nombre"])){
+        echo "No puedes borrar sesión si no la has iniciado";
+    }
 }
 
 $conProyecto = null;
 ?>
+
