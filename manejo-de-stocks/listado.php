@@ -8,9 +8,24 @@
         text-align: center;
     }
 
+    tr{
+        background-color: white;
+    }
+    
+
 </style>
 
 <?php
+session_start();
+
+if (isset($_SESSION["Nombre"])){
+    cambiar_style();
+    echo "<h2>Sesion iniciada</h2>";  
+}
+if (!isset($_SESSION["Nombre"])){
+    header("Location: login.php");
+    echo "<h3>Sesión no iniciada</h3>";
+}
 
 // PDO
 $host = "localhost";
@@ -72,20 +87,40 @@ while ($resultado != null) {
         echo "</tr>";
     echo "</table";
 
-    echo"<form method='post'>";
-        echo"<input type='submit' name='borrar' value='borrar sesion'/>";
-    echo"</form>";
-
     $resultado = $result->fetch(PDO::FETCH_OBJ);
 }
 
+echo"<form method='post'>";
+    echo"<input type='submit' name='borrar' value='borrar sesión'/>";
+echo"</form>";
+
+function cambiar_style(){
+    global $conProyecto;
+    $nombre = $_SESSION['Nombre'];
+    $result = $conProyecto->query(
+        "SELECT usuarios_pagina.colorfondo, 
+                usuarios_pagina.tipoletra
+         FROM 
+                usuarios_pagina
+        where 
+        usu");
+        
+        
+        $resultado = $result->fetch(PDO::FETCH_OBJ);
+
+    echo "<body style=background-color:'$resultado->colorfondo'/>";
+    echo "<body style=font-family:'$resultado->tipoletra'/>";
+        
+}
+
 if (isset($_POST["borrar"])){
+    echo "<h2>Borrada con éxito?</h2>"; 
     borrar();  
 }
 function borrar(){
     if (isset($_SESSION["Nombre"])){
         session_destroy();
-        echo "Borrada con éxito";  
+        echo "<h2>Borrada con éxito</h2>";  
     }
     if (!isset($_SESSION["Nombre"])){
         echo "No puedes borrar sesión si no la has iniciado";

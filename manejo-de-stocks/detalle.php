@@ -11,6 +11,15 @@
 </style>
 
 <?php
+session_start();
+
+if (isset($_SESSION["Nombre"])){
+    echo "<h2>Sesion iniciada</h2>";  
+}
+if (!isset($_SESSION["Nombre"])){
+    header("Location: login.php");
+    echo "<h3>Sesión no iniciada</h3>";
+}
 
 // PDO
 
@@ -71,6 +80,7 @@ while ($resultado != null) {
 
     $resultado = $result->fetch(PDO::FETCH_OBJ);
 }
+
 
 $conProyecto = null;
 ?>

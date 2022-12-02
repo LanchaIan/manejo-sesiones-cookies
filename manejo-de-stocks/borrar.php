@@ -10,6 +10,14 @@
 
 </style>
 <?php
+session_start();
+if (isset($_SESSION["Nombre"])){
+    echo "<h2>Sesion iniciada</h2>";  
+}
+if (!isset($_SESSION["Nombre"])){
+    header("Location: login.php");
+    echo "<h3>Sesión no iniciada</h3>";
+}
 
 // PDO
 $host = "localhost";
@@ -32,6 +40,7 @@ if(isset($_POST['id'])){
 
 $sql = $conProyecto->prepare("Delete From productos Where id=$id");
 $sql->execute();
+
 ?>
 <html>
     <form action="listado.php" method="post">

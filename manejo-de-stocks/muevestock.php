@@ -11,6 +11,14 @@
 </style>
 
 <?php
+session_start();
+if (isset($_SESSION["Nombre"])){
+    echo "<h2>Sesion iniciada</h2>";  
+}
+if (!isset($_SESSION["Nombre"])){
+    header("Location: login.php");
+    echo "<h3>Sesión no iniciada</h3>";
+}
 
 // PDO
 $host = "localhost";
@@ -248,11 +256,10 @@ if (isset($_POST['Mover'])){
     mover();
 }
 
-
-
 if (isset($_POST['brb'])){
     calcular_quitados();
 }
+
 ?>
 
 <html>

@@ -1,3 +1,4 @@
+
 <?php
 
 $validado = "false";
@@ -15,16 +16,14 @@ try {
     die("Error: " . $e->getMessage());
 }
 $result = $conProyecto->query(
-    "SELECT usuarios.usuario, 
-            usuarios.pass
+    "SELECT usuarios_pagina.usuario, 
+            usuarios_pagina.clave
      FROM 
-            usuarios");
+            usuarios_pagina");
     
     
     $resultado = $result->fetch(PDO::FETCH_OBJ);
 function iniciar_sesion(){
-    session_start();
-    $_SESSION["Nombre"] = $_POST["Nombre"];
 }
 function comprobar(){
     global $resultado;
@@ -33,10 +32,12 @@ function comprobar(){
 
     while ($resultado != null) {
         $usuario = $resultado->usuario;
-        $contraseña = $resultado->pass;
+        $contraseña = $resultado->clave;
 
         if ($usuario == $_POST["Nombre"] || $contraseña == $_POST["contra"]){
             $validado = "true";
+            session_start();
+            $_SESSION["Nombre"] = $_POST["Nombre"];
         }
 
         $resultado = $result->fetch(PDO::FETCH_OBJ);
@@ -57,6 +58,7 @@ if (isset($_POST["Nombre"])){
     comprobar();
 }
 if ($validado == "true"){
+    header("Location: listado.php");
     echo "<p>Hola {$_POST['Nombre']}.</p>";
     echo "<p>Introdujo {$_POST['contra']} como su contraseña.</p>";
     echo "<p>has iniciado sesión.</p>";
@@ -72,6 +74,5 @@ if ($validado == "true"){
             <input type="text" id="contra" name="contra"><br>
             <input type="submit" name="Enviar" value="Enviar"/>
         </form>
-        <a href="listado.php">Enviar a pagina de usuarios
     </body>
 </html>
