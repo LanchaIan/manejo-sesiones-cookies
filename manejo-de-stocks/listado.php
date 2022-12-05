@@ -1,4 +1,9 @@
 <style>
+
+    body{
+        background-color:<?=$color_fondo?>;
+        font-family:<?=$tipo_letra?>;
+    }
     table{
         border-style: solid;
     }
@@ -18,10 +23,6 @@
 <?php
 session_start();
 
-if (isset($_SESSION["Nombre"])){
-    cambiar_style();
-    echo "<h2>Sesion iniciada</h2>";  
-}
 if (!isset($_SESSION["Nombre"])){
     header("Location: login.php");
     echo "<h3>Sesión no iniciada</h3>";
@@ -40,6 +41,11 @@ try {
     echo "<h1>Manejo del proyecto</h1>";
 } catch (Exception $e) {
     die("Error: " . $e->getMessage());
+}
+
+if (isset($_SESSION["Nombre"])){
+    cambiar_style();
+    echo "<h2>Sesion iniciada</h2>";  
 }
 
 $result = $conProyecto->query(
@@ -90,26 +96,29 @@ while ($resultado != null) {
     $resultado = $result->fetch(PDO::FETCH_OBJ);
 }
 
-echo"<form method='post'>";
-    echo"<input type='submit' name='borrar' value='borrar sesión'/>";
-echo"</form>";
-
 function cambiar_style(){
     global $conProyecto;
     $nombre = $_SESSION['Nombre'];
-    $result = $conProyecto->query(
-        "SELECT usuarios_pagina.colorfondo, 
-                usuarios_pagina.tipoletra
-         FROM 
-                usuarios_pagina
-        where 
-        usu");
-        
-        
-        $resultado = $result->fetch(PDO::FETCH_OBJ);
+    $resulta = $conProyecto->query(
+    "SELECT usuarios_pagina.usuario,
+            usuarios_pagina.colorfondo, 
+            usuarios_pagina.tipoletra
+    FROM 
+            usuarios_pagina");
 
-    echo "<body style=background-color:'$resultado->colorfondo'/>";
-    echo "<body style=font-family:'$resultado->tipoletra'/>";
+    $resultado_usuarios = $resulta->fetch(PDO::FETCH_OBJ);
+        
+    while ($resultado_usuarios != null){
+        $usuario = $resultado_usuarios->usuario;
+        if ($usuario == $nombre){
+            echo "<h3>es el mismooo</h3>";
+            $color_fondo = $resultado_usuarios->colorfondo;
+            $tipo_letra = $resultado_usuarios->tipoletra;
+            echo "<h3>es el mismooo</h3>";
+        }
+        $resultado_usuarios = $resulta->fetch(PDO::FETCH_OBJ);
+    }
+
         
 }
 
@@ -118,7 +127,9 @@ if (isset($_POST["borrar"])){
     borrar();  
 }
 function borrar(){
+    echo "<h2>pillado</h2>";  
     if (isset($_SESSION["Nombre"])){
+        echo "<h2>Borrando</h2>";  
         session_destroy();
         echo "<h2>Borrada con éxito</h2>";  
     }
@@ -127,6 +138,14 @@ function borrar(){
     }
 }
 
+
 $conProyecto = null;
 ?>
 
+<html>
+    <body>
+        <form method='post'>
+            <input type='submit' id="borrar" name='borrar' value='borrar sesión'/>
+        </form>
+    </body>
+</html>

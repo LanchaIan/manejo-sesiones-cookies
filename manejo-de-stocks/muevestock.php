@@ -252,10 +252,6 @@ if (isset($_POST['unidades_movidas'])){
     $unidades_movidas = $_POST['unidades_movidas'];
 }
 
-if (isset($_POST['Mover'])){
-    mover();
-}
-
 if (isset($_POST['brb'])){
     calcular_quitados();
 }
@@ -263,7 +259,5 @@ if (isset($_POST['brb'])){
 ?>
 
 <html>
-    <form action="listado.php" method="post">
-        <input type='submit' name='boton' value='Volver'/>
-    </form>
+    <button onclick="mover()"> Borrar sesión </button>
 <html>

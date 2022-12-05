@@ -33,8 +33,9 @@ function comprobar(){
     while ($resultado != null) {
         $usuario = $resultado->usuario;
         $contraseña = $resultado->clave;
+        $usuario_introducido = $_POST["Nombre"];
 
-        if ($usuario == $_POST["Nombre"] || $contraseña == $_POST["contra"]){
+        if ($usuario == $usuario_introducido || $contraseña == $usuario_introducido){
             $validado = "true";
             session_start();
             $_SESSION["Nombre"] = $_POST["Nombre"];
@@ -57,12 +58,14 @@ if (isset($_POST["Nombre"])){
     iniciar_sesion();
     comprobar();
 }
+
 if ($validado == "true"){
     header("Location: listado.php");
     echo "<p>Hola {$_POST['Nombre']}.</p>";
     echo "<p>Introdujo {$_POST['contra']} como su contraseña.</p>";
     echo "<p>has iniciado sesión.</p>";
 }
+
 ?>
 
 <html>
